@@ -22,8 +22,9 @@ libzmq
 czmq
 */
 
+
 func main() {
-	endpoint := "tcp://127.0.0.1:5556"
+	endpoint := "tcp://127.0.0.1:5555"
 	repSock, err := czmq.NewRep(endpoint)
 	if err != nil {
 		panic(err)
