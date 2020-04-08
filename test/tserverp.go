@@ -1,12 +1,16 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"log"
-	"math/rand"
-
 	czmq "github.com/zeromq/goczmq"
+	"log"
 )
+
+type Vehicle struct {
+	Action string `json:"action"`
+	Value  int16  `json:"value"`
+}
 
 //https://github.com/zeromq/goczmq
 /**
@@ -26,25 +30,28 @@ func main() {
 	}
 
 	defer repSock.Destroy()
-
+	p := &Vehicle{}
 	for {
 
-		msg, err := repSock.RecvMessage()
+		msg, _, err := repSock.RecvFrame()
+		//fmt.Println(msg)
+
+		json.Unmarshal(msg, p)
+
+		//fmt.Println(msg)
+		fmt.Println(p)
 		if err != nil {
 			log.Fatalf("Failed to receive message: %s", err)
 		}
 
-		if len(msg) != 1 {
-			log.Fatalf("Message of incorrect size received: %d", len(msg))
-		}
-		zipcode := rand.Intn(100000)
-		temperature := rand.Intn(215) - 85
-		relHumidity := rand.Intn(50) + 10
 
-		rmsg := fmt.Sprintf("%d %d %d", zipcode, temperature, relHumidity)
-		err = repSock.SendMessage([][]byte{[]byte(rmsg)})
+
+
+
+		err = repSock.SendFrame(msg, 0)
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			//panic(err)
 		}
 	}
 }
